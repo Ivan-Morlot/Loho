@@ -47,42 +47,40 @@ namespace Loho.Utils
             while (sw.ElapsedMilliseconds <= WaitingTime)
             {
                 // need to display only when bool checking changes is true, following code is an insane non-sense shit
-                ListenKeyboardInc(this, sw);
-                ListenKeyboardDec(this, sw);
+                ListenKeyboardInc(this);
+                ListenKeyboardDec(this);
                 if (RestartWatch)
                 {
-                    sw.Restart();
                     Display();
-                    ActionsDuringThisWait++;
+                    sw.Restart();
                     RestartWatch = false;
+                    ActionsDuringThisWait++;
                 }
             }
             sw.Stop();
             WaitingTime = TempWaitingTime;
         }
 
-        private static async Task ListenKeyboardInc(Timer timer, Stopwatch sw)
+        private static async Task ListenKeyboardInc(Timer timer)
         // need a rework to repeat tasks infinitely into a specific waiting duration
         {
             await Task.Factory.StartNew(() =>
             {
                 while (Console.ReadKey(true).Key != ConsoleKey.DownArrow) { }
-                timer.WaitingTime = 1500;
-                sw.Restart();
                 if (timer.TempWaitingTime <= 100) return;
+                timer.WaitingTime = 1500;
                 timer.TempWaitingTime -= 300; // rework this, need to apply this into the wait using var - & var +
                 timer.RestartWatch = true;
             });
         }
 
-        private static async Task ListenKeyboardDec(Timer timer, Stopwatch sw)
+        private static async Task ListenKeyboardDec(Timer timer)
         {
             await Task.Factory.StartNew(() =>
             {
                 while (Console.ReadKey(true).Key != ConsoleKey.UpArrow) { }
-                timer.WaitingTime = 1500;
-                sw.Restart();
                 if (timer.TempWaitingTime >= 2500) return;
+                timer.WaitingTime = 1500;
                 timer.TempWaitingTime += 300;
                 timer.RestartWatch = true;
             });
